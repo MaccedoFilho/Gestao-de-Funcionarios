@@ -1,4 +1,8 @@
 package com.macedo.gestaofuncionarios.model;
 
-public class StatusFuncionario {
+public enum StatusFuncionario {
+    ATIVO,
+    INATIVO,
+    FERIAS,
+    LICENCA
 }
