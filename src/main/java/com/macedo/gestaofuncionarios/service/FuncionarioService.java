@@ -2,6 +2,7 @@ package com.macedo.gestaofuncionarios.service;
 
 import com.macedo.gestaofuncionarios.dto.*;
 import com.macedo.gestaofuncionarios.model.Funcionario;
+import com.macedo.gestaofuncionarios.model.StatusFuncionario;
 import com.macedo.gestaofuncionarios.repository.FuncionarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,27 +62,36 @@ public class FuncionarioService {
         funcionarioRepository.deleteById(id);
     }
 
-    private Funcionario mapRequestDtoToEntity(FuncionarioRequestDTO requestDTO) {
-        Funcionario funcionario = new Funcionario();
+    private void mapDtoToEntityFields(Funcionario funcionario, FuncionarioRequestDTO requestDTO) {
         funcionario.setNomeCompleto(requestDTO.getNomeCompleto());
         funcionario.setCpf(requestDTO.getCpf());
         funcionario.setDataNascimento(requestDTO.getDataNascimento());
         funcionario.setEmail(requestDTO.getEmail());
         funcionario.setTelefone(requestDTO.getTelefone());
 
-        funcionario.setLogradouro(requestDTO.getEndereco().getLogradouro());
-        funcionario.setNumero(requestDTO.getEndereco().getNumero());
-        funcionario.setComplemento(requestDTO.getEndereco().getComplemento());
-        funcionario.setBairro(requestDTO.getEndereco().getBairro());
-        funcionario.setCidade(requestDTO.getEndereco().getCidade());
-        funcionario.setUf(requestDTO.getEndereco().getUf());
-        funcionario.setCep(requestDTO.getEndereco().getCep());
+        EnderecoRequestDTO enderecoDTO = requestDTO.getEndereco();
+        if (enderecoDTO != null) {
+            funcionario.setLogradouro(enderecoDTO.getLogradouro());
+            funcionario.setNumero(enderecoDTO.getNumero());
+            funcionario.setComplemento(enderecoDTO.getComplemento());
+            funcionario.setBairro(enderecoDTO.getBairro());
+            funcionario.setCidade(enderecoDTO.getCidade());
+            funcionario.setUf(enderecoDTO.getUf());
+            funcionario.setCep(enderecoDTO.getCep());
+        }
 
-        funcionario.setCargo(requestDTO.getInfoProfissional().getCargo());
-        funcionario.setDataAdmissao(requestDTO.getInfoProfissional().getDataAdmissao());
-        funcionario.setSalario(requestDTO.getInfoProfissional().getSalario());
-        funcionario.setStatus(requestDTO.getInfoProfissional().getStatus());
+        InfoProfissionalRequestDTO infoDTO = requestDTO.getInfoProfissional();
+        if (infoDTO != null) {
+            funcionario.setCargo(infoDTO.getCargo());
+            funcionario.setDataAdmissao(infoDTO.getDataAdmissao());
+            funcionario.setSalario(infoDTO.getSalario());
+            funcionario.setStatus(infoDTO.getStatus());
+        }
+    }
 
+    private Funcionario mapRequestDtoToEntity(FuncionarioRequestDTO requestDTO) {
+        Funcionario funcionario = new Funcionario();
+        mapDtoToEntityFields(funcionario, requestDTO);
         return funcionario;
     }
 
@@ -94,44 +104,27 @@ public class FuncionarioService {
         responseDTO.setEmail(funcionario.getEmail());
         responseDTO.setTelefone(funcionario.getTelefone());
 
-        EnderecoResponseDTO enderecoDTO = new EnderecoResponseDTO();
-        enderecoDTO.setLogradouro(funcionario.getLogradouro());
-        enderecoDTO.setNumero(funcionario.getNumero());
-        enderecoDTO.setComplemento(funcionario.getComplemento());
-        enderecoDTO.setBairro(funcionario.getBairro());
-        enderecoDTO.setCidade(funcionario.getCidade());
-        enderecoDTO.setUf(funcionario.getUf());
-        enderecoDTO.setCep(funcionario.getCep());
-        responseDTO.setEndereco(enderecoDTO);
+        EnderecoResponseDTO enderecoResponseDTO = new EnderecoResponseDTO();
+        enderecoResponseDTO.setLogradouro(funcionario.getLogradouro());
+        enderecoResponseDTO.setNumero(funcionario.getNumero());
+        enderecoResponseDTO.setComplemento(funcionario.getComplemento());
+        enderecoResponseDTO.setBairro(funcionario.getBairro());
+        enderecoResponseDTO.setCidade(funcionario.getCidade());
+        enderecoResponseDTO.setUf(funcionario.getUf());
+        enderecoResponseDTO.setCep(funcionario.getCep());
+        responseDTO.setEndereco(enderecoResponseDTO);
 
-        InfoProfissionalResponseDTO infoDTO = new InfoProfissionalResponseDTO();
-        infoDTO.setCargo(funcionario.getCargo());
-        infoDTO.setDataAdmissao(funcionario.getDataAdmissao());
-        infoDTO.setSalario(funcionario.getSalario());
-        infoDTO.setStatus(funcionario.getStatus());
-        responseDTO.setInfoProfissional(infoDTO);
+        InfoProfissionalResponseDTO infoResponseDTO = new InfoProfissionalResponseDTO();
+        infoResponseDTO.setCargo(funcionario.getCargo());
+        infoResponseDTO.setDataAdmissao(funcionario.getDataAdmissao());
+        infoResponseDTO.setSalario(funcionario.getSalario());
+        infoResponseDTO.setStatus(funcionario.getStatus());
+        responseDTO.setInfoProfissional(infoResponseDTO);
 
         return responseDTO;
     }
 
     private void atualizarDadosEntityComRequestDto(Funcionario funcionarioExistente, FuncionarioRequestDTO requestDTO) {
-        funcionarioExistente.setNomeCompleto(requestDTO.getNomeCompleto());
-        funcionarioExistente.setCpf(requestDTO.getCpf());
-        funcionarioExistente.setDataNascimento(requestDTO.getDataNascimento());
-        funcionarioExistente.setEmail(requestDTO.getEmail());
-        funcionarioExistente.setTelefone(requestDTO.getTelefone());
-
-        funcionarioExistente.setLogradouro(requestDTO.getEndereco().getLogradouro());
-        funcionarioExistente.setNumero(requestDTO.getEndereco().getNumero());
-        funcionarioExistente.setComplemento(requestDTO.getEndereco().getComplemento());
-        funcionarioExistente.setBairro(requestDTO.getEndereco().getBairro());
-        funcionarioExistente.setCidade(requestDTO.getEndereco().getCidade());
-        funcionarioExistente.setUf(requestDTO.getEndereco().getUf());
-        funcionarioExistente.setCep(requestDTO.getEndereco().getCep());
-
-        funcionarioExistente.setCargo(requestDTO.getInfoProfissional().getCargo());
-        funcionarioExistente.setDataAdmissao(requestDTO.getInfoProfissional().getDataAdmissao());
-        funcionarioExistente.setSalario(requestDTO.getInfoProfissional().getSalario());
-        funcionarioExistente.setStatus(requestDTO.getInfoProfissional().getStatus());
+        mapDtoToEntityFields(funcionarioExistente, requestDTO);
     }
 }
